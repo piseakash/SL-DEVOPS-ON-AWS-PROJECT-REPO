@@ -1,43 +1,41 @@
-```yaml
 version: 0.2
 
 env:
   variables:
-    AWS_DEFAULT_REGION: "us-east-1"
+    AWS_DEFAULT_REGION: us-east-1
     AWS_ACCOUNT_ID: "590183844552"
-    IMAGE_REPO_NAME: "my-repo"
-    IMAGE_TAG: "latest"
+    IMAGE_REPO_NAME: my-repo
+    IMAGE_TAG: latest
 
 phases:
   install:
     runtime-versions:
       java: corretto17
     commands:
-      - echo "Checking Java and Maven versions"
+      - echo "Checking Java and Maven versions..."
       - java -version
       - mvn -version
       - docker --version
 
   pre_build:
     commands:
-      - echo "Logging in to Amazon ECR"
-      - export ECR_URI="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"
-      - aws ecr get-login-password --region "${AWS_DEFAULT_REGION}" | docker login --username AWS --password-stdin "${ECR_URI}"
-      - echo "ECR login successful"
+      - echo "Logging in to Amazon ECR..."
+      - ECR_URI=${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com
+      - aws ecr get-login-password --region ${AWS_DEFAULT_REGION} | docker login --username AWS --password-stdin ${ECR_URI}
+      - echo "ECR login successful."
 
   build:
     commands:
-      - echo "Building Java application"
+      - echo "Building Java application..."
       - mvn clean package
-      - echo "Building Docker image"
-      - docker build -t "${IMAGE_REPO_NAME}:${IMAGE_TAG}" .
-      - echo "Tagging Docker image"
-      - docker tag "${IMAGE_REPO_NAME}:${IMAGE_TAG}" "${ECR_URI}/${IMAGE_REPO_NAME}:${IMAGE_TAG}"
+      - echo "Building Docker image..."
+      - docker build -t ${IMAGE_REPO_NAME}:${IMAGE_TAG} .
+      - echo "Tagging Docker image..."
+      - docker tag ${IMAGE_REPO_NAME}:${IMAGE_TAG} ${ECR_URI}/${IMAGE_REPO_NAME}:${IMAGE_TAG}
 
   post_build:
     commands:
-      - echo "Pushing Docker image to Amazon ECR"
-      - docker push "${ECR_URI}/${IMAGE_REPO_NAME}:${IMAGE_TAG}"
-      - echo "Docker image pushed successfully"
+      - echo "Pushing Docker image to Amazon ECR..."
+      - docker push ${ECR_URI}/${IMAGE_REPO_NAME}:${IMAGE_TAG}
+      - echo "Docker image pushed successfully."
       - echo "Image URI: ${ECR_URI}/${IMAGE_REPO_NAME}:${IMAGE_TAG}"
-```
