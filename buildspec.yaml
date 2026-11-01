@@ -1,4 +1,3 @@
-
 version: 0.2
 
 env:
@@ -7,13 +6,14 @@ env:
     AWS_ACCOUNT_ID: "590183844552"
     IMAGE_REPO_NAME: "my-repo"
     IMAGE_TAG: "latest"
+    ECR_URI: "590183844552.dkr.ecr.us-east-1.amazonaws.com"
 
 phases:
   install:
     runtime-versions:
       java: corretto17
     commands:
-      - 'echo "Checking Java and Maven versions......."'
+      - 'echo "Checking Java and Maven versions..."'
       - 'java -version'
       - 'mvn -version'
       - 'docker --version'
@@ -21,7 +21,6 @@ phases:
   pre_build:
     commands:
       - 'echo "Logging in to Amazon ECR..."'
-      - 'export ECR_URI="${AWS_ACCOUNT_ID}.dkr.ecr.${AWS_DEFAULT_REGION}.amazonaws.com"'
       - 'aws ecr get-login-password --region "${AWS_DEFAULT_REGION}" | docker login --username AWS --password-stdin "${ECR_URI}"'
       - 'echo "ECR login successful."'
 
